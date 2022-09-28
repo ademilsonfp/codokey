@@ -7,8 +7,6 @@ import {
   Codokey
 } from '../src/key.js';
 
-const TZ_OFFSET_MS = new Date().getTimezoneOffset() * 60000;
-
 function getUtcTime(
   year: number,
   month: number,
@@ -18,7 +16,7 @@ function getUtcTime(
   second: number,
   millisecond: number
 ): number {
-  return new Date(
+  const d = new Date(
     year,
     month,
     date,
@@ -26,7 +24,9 @@ function getUtcTime(
     minute,
     second,
     millisecond
-  ).getTime() - TZ_OFFSET_MS;
+  );
+  
+  return d.getTime() - (d.getTimezoneOffset() * 60000);
 }
 
 tap.test('Codokey', function (tap) {
@@ -40,13 +40,13 @@ tap.test('Codokey', function (tap) {
     yield ['yl9dk0c11op', getUtcTime(2020, 2, 18, 3, 47, 22, 110)];
     yield ['yo6rg0p0fls', getUtcTime(2017, 5, 3, 7, 34, 44, 215)];
     yield ['yr4cc111hiv', getUtcTime(2014, 7, 19, 11, 22, 6, 320)];
-    yield ['yu1q81e0vfy', getUtcTime(2011, 10, 4, 16, 9, 28, 425)];
-    yield ['ywbc50309d1', getUtcTime(2009, 0, 19, 19, 56, 50, 530)];
+    yield ['yu1q71e0vfy', getUtcTime(2011, 10, 4, 16, 9, 28, 425)];
+    yield ['ywbc40309d1', getUtcTime(2009, 0, 19, 19, 56, 50, 530)];
     yield ['yz8o10f1ba4', getUtcTime(2006, 3, 6, 22, 44, 12, 635)];
     yield ['z267l0s0p77', getUtcTime(2003, 5, 23, 2, 31, 34, 740)];
     yield ['z53nh15034a', getUtcTime(2000, 8, 7, 6, 18, 56, 845)];
-    yield ['z817d1h151d', getUtcTime(1997, 10, 23, 11, 6, 18, 950)];
-    yield ['zaaka060ich', getUtcTime(1995, 1, 8, 14, 53, 41, 55)];
+    yield ['z817c1h151d', getUtcTime(1997, 10, 23, 11, 6, 18, 950)];
+    yield ['zaak9060iq8', getUtcTime(1995, 1, 8, 14, 53, 41, 55)];
     yield ['zd8560i1knb', getUtcTime(1992, 3, 25, 17, 41, 3, 160)];
     yield ['zg5k20v0yke', getUtcTime(1989, 6, 11, 21, 28, 25, 265)];
     yield ['zj33m180chh', getUtcTime(1986, 8, 27, 1, 15, 47, 370)];
@@ -61,19 +61,23 @@ tap.test('Codokey', function (tap) {
   var expected: string, timestamp: number;
   var defaultKey: string, specificKey: string;
 
+  /*
+  for ([expected, timestamp] of samples())
+    console.log(Codokey.from({ timestamp, context: SPECIFIC_CTX }).toString());
+  tap.end(); return;
+  */
+
   for ([expected, timestamp] of samples()) {
     defaultKey = Codokey.from({ timestamp }).toString();
     specificKey = Codokey.from({ timestamp, context: SPECIFIC_CTX }).toString();
 
     tap.equal(specificKey, expected, `expected ${expected}`);
 
-    if (!tap.equal(
-      Codokey.parse(specificKey, SPECIFIC_CTX).timestamp.date.getTime(),
+    tap.equal(
+      Codokey.parse(specificKey, SPECIFIC_CTX).timestamp.time,
       timestamp,
       `expected ${timestamp}`
-    )) {
-      console.log('>', Codokey.parse(specificKey, SPECIFIC_CTX).timestamp.date, new Date(timestamp));
-    };
+    );
 
     expected = expected.substring(0, 4);
     tap.equal(defaultKey, expected, `expected ${expected}`);
@@ -82,13 +86,11 @@ tap.test('Codokey', function (tap) {
       Math.floor(Math.floor(Math.floor(timestamp / 1000) / 60) / 60) / 24
     ) * 86400000;
 
-    if (!tap.equal(
-      Codokey.parse(defaultKey).timestamp.date.getTime(),
+    tap.equal(
+      Codokey.parse(defaultKey).timestamp.time,
       timestamp,
       `expected ${timestamp}`
-    )) {
-      console.log('>', Codokey.parse(defaultKey).timestamp.date, new Date(timestamp));
-    };
+    );
   }
 
   tap.end();

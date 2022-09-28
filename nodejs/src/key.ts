@@ -23,7 +23,7 @@ export class CodoTimestamp implements CodoTimestampJSON {
     return new CodoTimestamp(value, split);
   }
 
-  static from(timestamp: CodoTimestampFrom)  {
+  static from(timestamp: CodoTimestampFrom, debug = false)  {
     const isdate = timestamp instanceof Date;
     var split: number, value: number;
 
@@ -32,6 +32,8 @@ export class CodoTimestamp implements CodoTimestampJSON {
 
       value = Math.floor(t / 1000);
       split = t % 1000;
+
+      debug && console.log('.', t, value, split);
     } else {
       ({ value, split } = timestamp);
     }
@@ -179,8 +181,14 @@ export class CodoField {
   static split(until: number, split: number) {
     return CodoField.calc(
       until,
-      Math.floor(
-        split * Math.pow(10, CodoField.e10(until) - CodoField.e10(split))
+      (
+        split > until
+          ? (
+            Math.floor(
+              split * Math.pow(10, CodoField.e10(until) - CodoField.e10(split))
+            )
+          )
+          : split
       )
     );
   }
