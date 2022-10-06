@@ -1,7 +1,7 @@
 # Codokey
 
-Chaves de texto curtas e mínimamente dedutíveis a partir de datas, favorecendo a
-ordem da mais atual para a menos atual.
+Representação de datas como chaves de texto curtas e mínimamente dedutíveis,
+favorecendo a ordem da mais atual para a menos atual.
 
 ## Algoritmo
 
@@ -85,17 +85,69 @@ poderia utilizar _codokeys_ como um prefixo curto para os nomes,
 de tamanho fixo, com ordenação intuitiva e podendo ser concatenadas com um texto
 qualquer, como _semver_.
 
-Não é um método ideal para identificadores (_ID_).
+Não é um método ideal para identificadores (_ID_), porém pode ser utilizada para
+compor identificadores robustos.
 
 ### Exemplos
 
-```
-TODO
-```
+Alguns exemplos de _codokeys_ utilizando os parâmetros de contexto padrão:
 
-[Snowflake ID]: https://en.wikipedia.org/wiki/Snowflake_ID
+#### `year` precision (`0`)
 
+|key|ISO 8601|
+|-|-|
+|`yj`|`2022-01-01T00:00:00.000Z`|
+|`zz`|`1970-01-01T00:00:00.000Z`|
+
+#### `month` precision (`1`)
+
+|key|ISO 8601|
+|-|-|
+|`yj0`|`2022-12-01T00:00:00.000Z`|
+|`zzb`|`1970-01-01T00:00:00.000Z`|
+
+#### `day` precision (`2`)
+
+|key|ISO 8601|
+|-|-|
+|`yj00`|`2022-12-31T00:00:00.000Z`|
+|`zzbu`|`1970-01-01T00:00:00.000Z`|
+
+#### `hour` precision (`3`)
+
+|key|ISO 8601|
+|-|-|
+|`yj000`|`2022-12-31T23:00:00.000Z`|
+|`zzbun`|`1970-01-01T00:00:00.000Z`|
+
+#### `minute` precision (`4`)
+
+|key|ISO 8601|
+|-|-|
+|`yj00000`|`2022-12-31T23:59:00.000Z`|
+|`zzbun1n`|`1970-01-01T00:00:00.000Z`|
+
+#### `second` precision (`5`)
+
+|key|ISO 8601|
+|-|-|
+|`yj0000000`|`2022-12-31T23:59:59.000Z`|
+|`zzbun1n1n`|`1970-01-01T00:00:00.000Z`|
+
+#### `split` precision (`6`)
+
+|key|ISO 8601|
+|-|-|
+|`yj00000000`|`2022-12-31T23:59:59.900Z`|
+|`zzbun1n1n9`|`1970-01-01T00:00:00.000Z`|
+
+##### Com nanosegundos
+
+|key|`CodoTimestamp` (JS)|
+|-|-|
+|`yj00000000000`|`{"value":1672531199,"split":999.999}`|
+|`zzbun1n1nlflr`|`{"value":0,"split":0}`|
 
 ### Implementações
 
-- [Node.js](nodejs/) (Typescript).
+- [Node.js](nodejs/) e browsers (Typescript).
